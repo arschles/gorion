@@ -11,6 +11,18 @@
 			"Rev": "35bc42037350f0078e3c974c6ea690f1926603ab"
 		},
 		{
+			"ImportPath": "github.com/arschles/assert",
+			"Rev": "6882f85ccdc7c1822b146d1a6b0c2c48f91b5140"
+		},
+		{
+			"ImportPath": "github.com/arschles/synctest",
+			"Rev": "b605956712316badac33ecd7794ba695734ac255"
+		},
+		{
+			"ImportPath": "github.com/pivotal-golang/timer",
+			"Rev": "79a02f14345f482a54a963bda76bf1d17dbf3dc9"
+		},
+		{
 			"ImportPath": "golang.org/x/net/context",
 			"Rev": "d9558e5c97f85372afee28cf2b6059d7d3818919"
 		}
