@@ -10,14 +10,18 @@ import (
 	"github.com/arschles/gorion/Godeps/_workspace/src/golang.org/x/net/context"
 )
 
+// Scheme is "http" or "https"
 type Scheme string
 
+// String converts a Scheme to a printable string
 func (s Scheme) String() string {
 	return string(s)
 }
 
 const (
-	SchemeHTTP  = "http"
+	// SchemeHTTP represents http
+	SchemeHTTP = "http"
+	// SchemeHTTPS represents https
 	SchemeHTTPS = "https"
 )
 
@@ -27,6 +31,8 @@ type httpClient struct {
 	client    *http.Client
 }
 
+// NewHTTPClient returns a Client implementation that can talk to the IronMQ v3
+// API documented at http://dev.iron.io/mq/3/reference/api/
 func NewHTTPClient(scheme Scheme, host string, port uint16) Client {
 	transport := &http.Transport{}
 	client := &http.Client{Transport: transport}
@@ -41,6 +47,7 @@ type enqueueReq struct {
 	Messages []NewMessage `json:"messages"`
 }
 
+// Enqueue posts messages to IronMQ using the API defined at http://dev.iron.io/mq/3/reference/api/#post-messages
 func (h *httpClient) Enqueue(ctx context.Context, queueName string, msgs []NewMessage) (*Enqueued, error) {
 	reqBody := &bytes.Buffer{}
 	if err := json.NewEncoder(reqBody).Encode(enqueueReq{Messages: msgs}); err != nil {
@@ -79,6 +86,7 @@ type dequeueResp struct {
 	Messages []DequeuedMessage `json:"messages"`
 }
 
+// Dequeue gets messages from IronMQ using the API defined at http://dev.iron.io/mq/3/reference/api/#reserve-messages
 func (h *httpClient) Dequeue(ctx context.Context, qName string, num int, timeout Timeout, wait Wait, delete bool) ([]DequeuedMessage, error) {
 	if !timeoutInRange(timeout) {
 		return nil, ErrTimeoutOutOfRange

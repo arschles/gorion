@@ -43,8 +43,10 @@ const (
 )
 
 var (
+	// ErrTimeoutOutOfRange is returned when a Timeout is given that's out of the [MinTimeout, MaxTimeout] range
 	ErrTimeoutOutOfRange = fmt.Errorf("timeout out of range [%d, %d]", MinTimeout, MaxTimeout)
-	ErrWaitOutOfRange    = fmt.Errorf("wait out of range [%d, %d]", MinWait, MaxWait)
+	// ErrWaitOutOfRange is returned when a Wait is given that's out of the [MinWait, MaxTimeout] range
+	ErrWaitOutOfRange = fmt.Errorf("wait out of range [%d, %d]", MinWait, MaxWait)
 )
 
 // Enqueued is the the result of the Enqueue interface function
@@ -55,6 +57,7 @@ type Enqueued struct {
 	Msg string `json:"msg"`
 }
 
+// Client is an interface for communicating with the IronMQ service.
 type Client interface {
 	// Enqueue enqueues msgs onto qName. if ctx.Done() receives before the enqueue
 	// operation completes, the client must attempt to cancel the enqueue operation and

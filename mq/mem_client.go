@@ -26,6 +26,8 @@ type memClient struct {
 	reserved map[string]memMsg
 }
 
+// NewMemClient returns a purely in-memory Client implementation that can be used
+// for testing
 func NewMemClient() Client {
 	mtx := sync.Mutex{}
 	return &memClient{
