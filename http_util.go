@@ -1,9 +1,14 @@
 package gorion
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/arschles/gorion/Godeps/_workspace/src/golang.org/x/net/context"
+)
+
+var (
+	ErrCancelled = errors.New("cancelled")
 )
 
 // HTTPDo runs the HTTP request in a goroutine and passes the response to f in
@@ -33,6 +38,13 @@ import (
 func HTTPDo(ctx context.Context, client *http.Client, transport *http.Transport, req *http.Request, f func(*http.Response, error) error) error {
 	// Run the HTTP request in a goroutine and pass the response to f.
 	c := make(chan error, 1)
+
+	// see if the ctx was already cancelled/timed out
+	select {
+	case <-ctx.Done():
+		return ErrCancelled
+	default:
+	}
 
 	go func() {
 		c <- f(client.Do(req))
