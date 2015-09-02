@@ -1,6 +1,7 @@
 package mq
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -47,13 +48,24 @@ var (
 	ErrTimeoutOutOfRange = fmt.Errorf("timeout out of range [%d, %d]", MinTimeout, MaxTimeout)
 	// ErrWaitOutOfRange is returned when a Wait is given that's out of the [MinWait, MaxTimeout] range
 	ErrWaitOutOfRange = fmt.Errorf("wait out of range [%d, %d]", MinWait, MaxWait)
+	// ErrNoSuchReservation is returned from funcs that accept a reservation ID
+	// when the ID doesn't exist
+	ErrNoSuchReservation = errors.New("no such reservation")
+	// ErrNoSuchMessage is returned from funcs that accept a message ID when the
+	// ID doesn't exist
+	ErrNoSuchMessage = errors.New("no such message")
 )
 
-// Enqueued is the the result of the Enqueue interface function
+// Enqueued is the result of the Enqueue func
 type Enqueued struct {
 	// IDs are the IDs of the enqueued messages
 	IDs []string `json:"ids"`
 	// Msg is the resulting status of the enqueue operation
+	Msg string `json:"msg"`
+}
+
+// Deleted is the result of the DeleteReserved func
+type Deleted struct {
 	Msg string `json:"msg"`
 }
 
@@ -79,4 +91,17 @@ type Client interface {
 	// Note that clients need not roll back a partially applied dequeue operation
 	// if ctx.Done() received before it completely finished.
 	Dequeue(ctx context.Context, qName string, num int, timeout Timeout, wait Wait, delete bool) ([]DequeuedMessage, error)
+
+	// DeleteReserved deletes the reserved message with the given message ID and reservation ID
+	// from the queue with the given name.
+	//
+	// Returns nil and an error if ctx.Done() receives before the delete operation succeeds.
+	//
+	// Returns nil and ErrNoSuchReservation if reservationID refers to a reservation that doesn't exist in the queue.
+	//
+	// Finally, returns nil and a non-nil error if any other error occurs.
+	//
+	// Note that clients need not roll back a partially applied delete operation
+	// if ctx.Done() received before it finished
+	DeleteReserved(ctx context.Context, qName string, messageID int, reservationID string) (*Deleted, error)
 }

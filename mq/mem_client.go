@@ -27,7 +27,8 @@ type memClient struct {
 }
 
 // NewMemClient returns a purely in-memory Client implementation that can be used
-// for testing
+// for testing. Note that funcs with in-memory client receivers do not pay attention
+// to the context.Context parameters that are passed to them.
 func NewMemClient() Client {
 	mtx := sync.Mutex{}
 	return &memClient{
@@ -104,6 +105,19 @@ func (m *memClient) Dequeue(ctx context.Context, qName string, num int, timeout 
 		ret = append(ret, r.DequeuedMessage)
 	}
 	return ret, nil
+}
+
+func (m *memClient) DeleteReserved(ctx context.Context, qName string, messageID int, reservationID string) (*Deleted, error) {
+	m.lck.Lock()
+	defer m.lck.Unlock()
+	msg, ok := m.reserved[reservationID]
+	if !ok {
+		return nil, ErrNoSuchReservation
+	}
+	if msg.ID != messageID {
+		return nil, ErrNoSuchMessage
+	}
+	return &Deleted{Msg: "deleted"}, nil
 }
 
 func (m *memClient) releaseReservedMsg(resID string, timeout Timeout) {

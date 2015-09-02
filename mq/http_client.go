@@ -58,7 +58,7 @@ func (h *httpClient) Enqueue(ctx context.Context, queueName string, msgs []NewMe
 	if err != nil {
 		return nil, err
 	}
-	var ret *Enqueued
+	ret := new(Enqueued)
 	doFunc := func(resp *http.Response, err error) error {
 		if err != nil {
 			return err
@@ -103,7 +103,7 @@ func (h *httpClient) Dequeue(ctx context.Context, qName string, num int, timeout
 	if err != nil {
 		return nil, err
 	}
-	var ret *dequeueResp
+	ret := new(dequeueResp)
 	doFunc := func(resp *http.Response, err error) error {
 		if err != nil {
 			return err
@@ -118,6 +118,36 @@ func (h *httpClient) Dequeue(ctx context.Context, qName string, num int, timeout
 		return nil, err
 	}
 	return ret.Messages, nil
+}
+
+type deleteReservedReq struct {
+	ReservationID string `json:"reservation_id"`
+}
+
+func (h *httpClient) DeleteReserved(ctx context.Context, qName string, messageID int, reservationID string) (*Deleted, error) {
+	body := &bytes.Buffer{}
+	if err := json.NewEncoder(body).Encode(deleteReservedReq{ReservationID: reservationID}); err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest("DELETE", h.urlStr("queues/%s/messages/%d", qName, messageID), body)
+	if err != nil {
+		return nil, err
+	}
+	ret := new(Deleted)
+	doFunc := func(resp *http.Response, err error) error {
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if err := json.NewDecoder(resp.Body).Decode(ret); err != nil {
+			return err
+		}
+		return nil
+	}
+	if err := gorion.HTTPDo(ctx, h.client, h.transport, req, doFunc); err != nil {
+		return nil, err
+	}
+	return ret, nil
 }
 
 // urlStr returns the url string resulting from appending path to h.endpt.
