@@ -19,6 +19,10 @@
 			"Rev": "b605956712316badac33ecd7794ba695734ac255"
 		},
 		{
+			"ImportPath": "github.com/arschles/testsrv",
+			"Rev": "f34ddcbdbf099d067f55774b78c3c6e2aec36417"
+		},
+		{
 			"ImportPath": "github.com/pivotal-golang/timer",
 			"Rev": "79a02f14345f482a54a963bda76bf1d17dbf3dc9"
 		},
