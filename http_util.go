@@ -8,6 +8,8 @@ import (
 )
 
 var (
+	// ErrCancelled is returned immediately when a func returns a net.Context that is
+	// already cancelled.
 	ErrCancelled = errors.New("cancelled")
 )
 
