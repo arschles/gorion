@@ -23,6 +23,14 @@
 			"Rev": "f34ddcbdbf099d067f55774b78c3c6e2aec36417"
 		},
 		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "215affda49addc4c8ef7e2534915df2c8c35c6cd"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "8096f47503459bcc74d1f4c487b7e6e42e5746b5"
+		},
+		{
 			"ImportPath": "github.com/pivotal-golang/timer",
 			"Rev": "79a02f14345f482a54a963bda76bf1d17dbf3dc9"
 		},

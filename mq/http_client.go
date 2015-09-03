@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/arschles/gorion"
@@ -22,25 +23,40 @@ const (
 	// SchemeHTTP represents http
 	SchemeHTTP = "http"
 	// SchemeHTTPS represents https
-	SchemeHTTPS = "https"
+	SchemeHTTPS     = "https"
+	applicationJSON = "application/json"
+	oauth           = "OAuth"
 )
 
 type httpClient struct {
-	endpt     string
-	transport *http.Transport
-	client    *http.Client
+	endpt      string
+	transport  *http.Transport
+	client     *http.Client
+	oauthToken string
 }
 
 // NewHTTPClient returns a Client implementation that can talk to the IronMQ v3
 // API documented at http://dev.iron.io/mq/3/reference/api/
-func NewHTTPClient(scheme Scheme, host string, port uint16) Client {
+func NewHTTPClient(scheme Scheme, host string, port uint16, oauthToken, projectID string) Client {
 	transport := &http.Transport{}
 	client := &http.Client{Transport: transport}
 	return &httpClient{
-		transport: transport,
-		client:    client,
-		endpt:     fmt.Sprintf("%s://%s:%d", scheme, host, port),
+		transport:  transport,
+		client:     client,
+		endpt:      fmt.Sprintf("%s://%s:%d/3/projects/%s", scheme, host, port, projectID),
+		oauthToken: oauthToken,
 	}
+}
+
+// headers sets json and oauth headers on r
+func (h *httpClient) newReq(method, path string, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequest(method, h.endpt+"/"+path, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "OAuth "+h.oauthToken)
+	return req, nil
 }
 
 type enqueueReq struct {
@@ -54,7 +70,7 @@ func (h *httpClient) Enqueue(ctx context.Context, queueName string, msgs []NewMe
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", h.urlStr("queues/%s/messages", queueName), reqBody)
+	req, err := h.newReq("POST", fmt.Sprintf("queues/%s/messages", queueName), reqBody)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +115,7 @@ func (h *httpClient) Dequeue(ctx context.Context, qName string, num int, timeout
 	if err := json.NewEncoder(body).Encode(dequeueReq{Num: num, Timeout: int(timeout), Wait: int(wait), Delete: delete}); err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", h.urlStr("queues/%s/reservations", qName), body)
+	req, err := h.newReq("POST", fmt.Sprintf("queues/%s/reservations", qName), body)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +145,7 @@ func (h *httpClient) DeleteReserved(ctx context.Context, qName string, messageID
 	if err := json.NewEncoder(body).Encode(deleteReservedReq{ReservationID: reservationID}); err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("DELETE", h.urlStr("queues/%s/messages/%d", qName, messageID), body)
+	req, err := h.newReq("DELETE", fmt.Sprintf("queues/%s/messages/%d", qName, messageID), body)
 	if err != nil {
 		return nil, err
 	}
@@ -148,10 +164,4 @@ func (h *httpClient) DeleteReserved(ctx context.Context, qName string, messageID
 		return nil, err
 	}
 	return ret, nil
-}
-
-// urlStr returns the url string resulting from appending path to h.endpt.
-// pass path without a leading slash
-func (h *httpClient) urlStr(pathFmt string, fmtVars ...interface{}) string {
-	return h.endpt + "/" + fmt.Sprintf(pathFmt, fmtVars...)
 }

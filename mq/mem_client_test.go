@@ -7,7 +7,6 @@ import (
 	"github.com/arschles/gorion/Godeps/_workspace/src/github.com/arschles/assert"
 	"github.com/arschles/gorion/Godeps/_workspace/src/github.com/arschles/synctest"
 	"github.com/arschles/gorion/Godeps/_workspace/src/github.com/pivotal-golang/timer/fake_timer"
-	"github.com/arschles/gorion/Godeps/_workspace/src/golang.org/x/net/context"
 )
 
 func TestReleaseReservedMsg(t *testing.T) {
@@ -44,11 +43,8 @@ func TestDeferEnqueue(t *testing.T) {
 	cl.lck.Unlock()
 }
 
-func TestEnqueueDequeue(t *testing.T) {
+func TestMemQueueOperations(t *testing.T) {
 	cl := NewMemClient()
-	enq, err := cl.Enqueue(context.Background(), "q", []NewMessage{
-		{Body: "test1", Delay: 0, PushHeaders: make(map[string]string)},
-	})
+	err := qOperations(cl)
 	assert.NoErr(t, err)
-	assert.Equal(t, len(enq.IDs), 1, "number of message IDs")
 }
