@@ -1,5 +1,6 @@
-// Package mq provides a Client interface for code that needs an IronMQ v3
-// (http://dev.iron.io/mq/3/reference/api/) client. Example usage:
+// Package mq provides a Client interface for code that needs an IronMQ v3 (http://dev.iron.io/mq/3/reference/api/) client.
+//
+// Example usage:
 //
 //  import (
 //    "github.com/arschles/gorion/mq"
