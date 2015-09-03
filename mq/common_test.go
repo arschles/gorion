@@ -3,7 +3,7 @@ package mq
 import (
 	"fmt"
 
-	"github.com/arschles/gorion/Godeps/_workspace/src/golang.org/x/net/context"
+	"golang.org/x/net/context"
 )
 
 func qOperations(cl Client) error {

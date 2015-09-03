@@ -5,9 +5,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/arschles/gorion/Godeps/_workspace/src/code.google.com/p/go-uuid/uuid"
-	"github.com/arschles/gorion/Godeps/_workspace/src/github.com/pivotal-golang/timer"
-	"github.com/arschles/gorion/Godeps/_workspace/src/golang.org/x/net/context"
+	"code.google.com/p/go-uuid/uuid"
+	"github.com/pivotal-golang/timer"
+	"golang.org/x/net/context"
 )
 
 type memMsg struct {

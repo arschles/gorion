@@ -2,7 +2,7 @@ package examples
 
 import (
 	"errors"
-	"github.com/arschles/gorion/Godeps/_workspace/src/github.com/arschles/assert"
+	"github.com/arschles/assert"
 	"testing"
 )
 

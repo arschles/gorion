@@ -1,10 +1,11 @@
 package fake_timer_test
 
 import (
-	. "github.com/arschles/gorion/Godeps/_workspace/src/github.com/pivotal-golang/timer/fake_timer"
+	"time"
+	. "github.com/pivotal-golang/timer/fake_timer"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"time"
 )
 
 var _ = Describe("FakeTimer", func() {

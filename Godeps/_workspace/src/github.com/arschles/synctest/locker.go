@@ -1,10 +1,10 @@
-// package synctest contains utilities for testing code that uses code in the
+// Package synctest contains utilities for testing code that uses code in the
 // sync package
 package synctest
 
 import "sync"
 
-// Locker is an implementation of sync.Locker that notifies callers when
+// NotifyingLocker is an implementation of sync.Locker that notifies callers when
 // locks and unlocks happen. otherwise, it behaves identically as a sync.Mutex.
 //
 // Example usage:

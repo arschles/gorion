@@ -2,4 +2,5 @@
 
 [![GoDoc](https://godoc.org/github.com/arschles/gorion?status.svg)](https://godoc.org/github.com/arschles/gorion)
 
-An enhanced Iron.io client library
+A Go client library for [Iron.io](http://www.iron.io/) services. This library builds
+a 

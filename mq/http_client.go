@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/arschles/gorion"
-	"github.com/arschles/gorion/Godeps/_workspace/src/golang.org/x/net/context"
+	"golang.org/x/net/context"
 )
 
 // Scheme is "http" or "https"

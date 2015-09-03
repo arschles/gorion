@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arschles/gorion/Godeps/_workspace/src/github.com/arschles/assert"
-	"github.com/arschles/gorion/Godeps/_workspace/src/github.com/arschles/synctest"
-	"github.com/arschles/gorion/Godeps/_workspace/src/github.com/pivotal-golang/timer/fake_timer"
+	"github.com/arschles/assert"
+	"github.com/arschles/synctest"
+	"github.com/pivotal-golang/timer/fake_timer"
 )
 
 func TestReleaseReservedMsg(t *testing.T) {
