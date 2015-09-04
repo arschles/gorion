@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-// Timeout is the number of seconds until a message reservation times out
+// Timeout is the number of seconds until a message reservation times out. Max is 86,400
 type Timeout uint32
 
 // String converts a timeout value to a printable string
@@ -16,7 +16,7 @@ func (t Timeout) String() string {
 	return strconv.Itoa(int(t))
 }
 
-// Wait is the number of seconds to wait for a message
+// Wait is the number of seconds to wait for a message. Max is 30
 type Wait uint16
 
 // String converts a wait value to a printable string
