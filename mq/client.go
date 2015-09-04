@@ -11,6 +11,14 @@ import (
 // Timeout is the number of seconds until a message reservation times out. Max is 86,400
 type Timeout uint32
 
+// TimeoutFromInt returns a Timeout representation of i if i is in range. Returns ErrTimeoutOutOfRange otherwise
+func TimeoutFromInt(i int) (Timeout, error) {
+	if i >= MinTimeout && i <= MaxTimeout {
+		return Timeout(i), nil
+	}
+	return 0, ErrTimeoutOutOfRange
+}
+
 // String converts a timeout value to a printable string
 func (t Timeout) String() string {
 	return strconv.Itoa(int(t))
@@ -19,28 +27,38 @@ func (t Timeout) String() string {
 // Wait is the number of seconds to wait for a message. Max is 30
 type Wait uint16
 
+// WaitFromInt returns a Wait representation of i if i is in range. Returns ErrWaitOutOfRange otherwise.
+func WaitFromInt(i int) (Wait, error) {
+	if i >= MinWait && i <= MaxWait {
+		return Wait(i), nil
+	}
+	return 0, ErrWaitOutOfRange
+}
+
 // String converts a wait value to a printable string
 func (w Wait) String() string {
 	return strconv.Itoa(int(w))
 }
 
+// WaitInRange determines whether the given Wait value is in the valid range
 func waitInRange(w Wait) bool {
 	return w <= MaxWait && w >= MinWait
 }
 
+// TimeoutInRange determines whether the given Timeout value is in the valid range
 func timeoutInRange(t Timeout) bool {
 	return t <= MaxTimeout && t >= MinTimeout
 }
 
 const (
 	// MinTimeout is the minimum value for a Timeout
-	MinTimeout Timeout = 30
+	MinTimeout = 30
 	// MaxTimeout is the maximum value for a Timeout
-	MaxTimeout Timeout = 86400
+	MaxTimeout = 86400
 	// MinWait is the minimum value for a Wait
-	MinWait Wait = 0
+	MinWait = 0
 	// MaxWait is the maximum value for a wait
-	MaxWait Wait = 30
+	MaxWait = 30
 )
 
 var (
