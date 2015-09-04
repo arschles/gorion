@@ -9,11 +9,10 @@ import (
 	"net/http"
 
 	"github.com/arschles/gorion"
-	"golang.org/x/net/context"
+	"github.com/arschles/gorion/Godeps/_workspace/src/golang.org/x/net/context"
 )
 
-// Scheme is "http" or "https"
-type Scheme string
+type Scheme string // Scheme is "http" or "https"
 
 // SchemeFromString returns a Scheme representation of s. If s is not a supported scheme, returns ErrInvalidScheme
 func SchemeFromString(s string) (Scheme, error) {

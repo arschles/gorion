@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"golang.org/x/net/context"
+	"github.com/arschles/gorion/Godeps/_workspace/src/golang.org/x/net/context"
 )
 
 // Timeout is the number of seconds until a message reservation times out. Max is 86,400

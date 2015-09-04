@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/arschles/assert"
-	"github.com/arschles/testsrv"
-	"github.com/gorilla/mux"
-	"golang.org/x/net/context"
+	"github.com/arschles/gorion/Godeps/_workspace/src/github.com/arschles/assert"
+	"github.com/arschles/gorion/Godeps/_workspace/src/github.com/arschles/testsrv"
+	"github.com/arschles/gorion/Godeps/_workspace/src/github.com/gorilla/mux"
+	"github.com/arschles/gorion/Godeps/_workspace/src/golang.org/x/net/context"
 )
 
 var (

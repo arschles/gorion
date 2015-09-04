@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"golang.org/x/net/context"
+	"github.com/arschles/gorion/Godeps/_workspace/src/golang.org/x/net/context"
 )
 
 var (

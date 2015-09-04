@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arschles/assert"
-	"github.com/arschles/testsrv"
-	"golang.org/x/net/context"
+	"github.com/arschles/gorion/Godeps/_workspace/src/github.com/arschles/assert"
+	"github.com/arschles/gorion/Godeps/_workspace/src/github.com/arschles/testsrv"
+	"github.com/arschles/gorion/Godeps/_workspace/src/golang.org/x/net/context"
 )
 
 func TestHTTPDo(t *testing.T) {
