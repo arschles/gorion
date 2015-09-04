@@ -77,7 +77,7 @@ type Client interface {
 	//
 	// Note that clients need not roll back a partially applied enqueue operation if
 	// ctx.Done() received before it completely finished
-	Enqueue(ctx context.Context, qName string, msgs []NewMessage) (*Enqueued, error)
+	Enqueue(ctx context.Context, token, projID, qName string, msgs []NewMessage) (*Enqueued, error)
 
 	// Dequeue dequeues at most num messages from qName or until wait expires.
 	// Each dequeued message's reservation will expire after timeout. If delete is
@@ -90,7 +90,7 @@ type Client interface {
 	//
 	// Note that clients need not roll back a partially applied dequeue operation
 	// if ctx.Done() received before it completely finished.
-	Dequeue(ctx context.Context, qName string, num int, timeout Timeout, wait Wait, delete bool) ([]DequeuedMessage, error)
+	Dequeue(ctx context.Context, token, projID, qName string, num int, timeout Timeout, wait Wait, delete bool) ([]DequeuedMessage, error)
 
 	// DeleteReserved deletes the reserved message with the given message ID and reservation ID
 	// from the queue with the given name.
@@ -103,5 +103,5 @@ type Client interface {
 	//
 	// Note that clients need not roll back a partially applied delete operation
 	// if ctx.Done() received before it finished
-	DeleteReserved(ctx context.Context, qName string, messageID int, reservationID string) (*Deleted, error)
+	DeleteReserved(ctx context.Context, token, projID, qName string, messageID int, reservationID string) (*Deleted, error)
 }

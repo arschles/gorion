@@ -6,11 +6,16 @@ import (
 	"golang.org/x/net/context"
 )
 
+const (
+	token  = "test-token"
+	qName  = "test-queue"
+	projID = "test-proj"
+)
+
 func qOperations(cl Client) error {
 	newMsgs := []NewMessage{{Body: "123", Delay: 0, PushHeaders: make(map[string]string)}}
 	ctx := context.Background()
-	qName := "queue1"
-	enqRes, err := cl.Enqueue(ctx, qName, newMsgs)
+	enqRes, err := cl.Enqueue(ctx, token, projID, qName, newMsgs)
 	if err != nil {
 		return fmt.Errorf("got error on enqueue [%s]", err)
 	}
@@ -18,7 +23,7 @@ func qOperations(cl Client) error {
 		return fmt.Errorf("Enqueue returned [%d] message IDs, expected 1", len(enqRes.IDs))
 	}
 	// dequeue & reserve
-	dqMsgs, err := cl.Dequeue(ctx, qName, 1, Timeout(30), Wait(1), false)
+	dqMsgs, err := cl.Dequeue(ctx, token, projID, qName, 1, Timeout(30), Wait(1), false)
 	if err != nil {
 		return fmt.Errorf("got error on dequeue [%s]", err)
 	}
@@ -33,7 +38,7 @@ func qOperations(cl Client) error {
 		if dqMsg.ReservedCount != 1 {
 			return fmt.Errorf("dequeued message was reserved [%d] times", dqMsg.ReservedCount)
 		}
-		deletedRes, err := cl.DeleteReserved(ctx, qName, dqMsg.ID, dqMsg.ReservationID)
+		deletedRes, err := cl.DeleteReserved(ctx, token, projID, qName, dqMsg.ID, dqMsg.ReservationID)
 		if err != nil {
 			return fmt.Errorf("DeleteReserved returned error [%s]", err)
 		}

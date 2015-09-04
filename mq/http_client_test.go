@@ -14,11 +14,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-const (
-	oauthToken = "testtoken"
-	projectID  = "testproj"
-)
-
 var (
 	bgCtx = context.Background()
 )
@@ -41,7 +36,7 @@ func (q *qServer) enqueueHandler() http.Handler {
 			return
 		}
 
-		res, err := q.mem.Enqueue(bgCtx, qName, req.Messages)
+		res, err := q.mem.Enqueue(bgCtx, token, projID, qName, req.Messages)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("error enqueueing [%s]", err), http.StatusInternalServerError)
 			return
@@ -67,7 +62,7 @@ func (q *qServer) dequeueHandler() http.Handler {
 			return
 		}
 
-		msgs, err := q.mem.Dequeue(bgCtx, qName, req.Num, Timeout(req.Timeout), Wait(req.Wait), false)
+		msgs, err := q.mem.Dequeue(bgCtx, token, projID, qName, req.Num, Timeout(req.Timeout), Wait(req.Wait), false)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("dequeue error [%s]", err), http.StatusInternalServerError)
 			return
@@ -102,7 +97,7 @@ func (q *qServer) deleteReservedHandler() http.Handler {
 			http.Error(w, fmt.Sprintf("invalid json [%s]", err), http.StatusBadRequest)
 			return
 		}
-		ret, err := q.mem.DeleteReserved(bgCtx, qName, msgID, req.ReservationID)
+		ret, err := q.mem.DeleteReserved(bgCtx, token, projID, qName, msgID, req.ReservationID)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("error deleting reserved msg [%s]", err), http.StatusInternalServerError)
 			return
@@ -137,6 +132,6 @@ func TestHTTPQueueOperations(t *testing.T) {
 	if port > 65535 {
 		t.Fatalf("port [%d] not a uint16", port)
 	}
-	cl := NewHTTPClient(SchemeHTTP, host, uint16(port), oauthToken, projectID)
+	cl := NewHTTPClient(SchemeHTTP, host, uint16(port))
 	assert.NoErr(t, qOperations(cl))
 }
