@@ -9,10 +9,11 @@ import (
 	"net/http"
 
 	"github.com/arschles/gorion"
-	"github.com/arschles/gorion/Godeps/_workspace/src/golang.org/x/net/context"
+	"golang.org/x/net/context"
 )
 
-type Scheme string // Scheme is "http" or "https"
+// Scheme is the scheme in the URL to the IronMQ v3 API
+type Scheme string
 
 // SchemeFromString returns a Scheme representation of s. If s is not a supported scheme, returns ErrInvalidScheme
 func SchemeFromString(s string) (Scheme, error) {
