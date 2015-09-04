@@ -3,6 +3,7 @@ package mq
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,10 +15,26 @@ import (
 // Scheme is "http" or "https"
 type Scheme string
 
+// SchemeFromString returns a Scheme representation of s. If s is not a supported scheme, returns ErrInvalidScheme
+func SchemeFromString(s string) (Scheme, error) {
+	switch s {
+	case SchemeHTTP:
+		return SchemeHTTP, nil
+	case SchemeHTTPS:
+		return SchemeHTTPS, nil
+	default:
+		return Scheme(""), ErrInvalidScheme
+	}
+}
+
 // String converts a Scheme to a printable string
 func (s Scheme) String() string {
 	return string(s)
 }
+
+var (
+	ErrInvalidScheme = errors.New("invalid scheme")
+)
 
 const (
 	// SchemeHTTP represents http
