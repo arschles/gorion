@@ -12,7 +12,7 @@ import (
 func TestReleaseReservedMsg(t *testing.T) {
 	fakeTmr := fake_timer.NewFakeTimer(time.Now())
 	lckr := synctest.NewNotifyingLocker()
-	cl := memClient{tmr: fakeTmr, reserved: make(map[string]memMsg), queues: make(map[string][]memMsg), lck: lckr}
+	cl := MemClient{tmr: fakeTmr, reserved: make(map[string]memMsg), queues: make(map[string][]memMsg), lck: lckr}
 	msg := cl.newMemMsg(NewMessage{Body: "abc", Delay: 1, PushHeaders: make(map[string]string)})
 	cl.reserved[msg.ReservationID] = msg
 	go cl.releaseReservedMsg(projID, qName, msg.ReservationID, Timeout(2))
@@ -28,7 +28,7 @@ func TestReleaseReservedMsg(t *testing.T) {
 func TestDeferEnqueue(t *testing.T) {
 	fakeTmr := fake_timer.NewFakeTimer(time.Now())
 	lckr := synctest.NewNotifyingLocker()
-	cl := memClient{tmr: fakeTmr, lck: lckr, queues: make(map[string][]memMsg)}
+	cl := MemClient{tmr: fakeTmr, lck: lckr, queues: make(map[string][]memMsg)}
 	msg := cl.newMemMsg(NewMessage{Body: "abc", Delay: 1, PushHeaders: make(map[string]string)})
 	go cl.deferEnqueue(projID, qName, msg)
 	cl.lck.Lock()

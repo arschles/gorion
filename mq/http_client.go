@@ -33,6 +33,7 @@ func (s Scheme) String() string {
 }
 
 var (
+	// ErrInvalidScheme is returned from any func that converts something to a Scheme when the value is an invalid scheme
 	ErrInvalidScheme = errors.New("invalid scheme")
 )
 
@@ -45,7 +46,9 @@ const (
 	oauth           = "OAuth"
 )
 
-type httpClient struct {
+// HTTPClient is a Client implementation that talks to an arbitrary IronMQ v3 API (http://dev.iron.io/mq/3/reference/api/).
+// Use NewHTTPClient to create a new one of these.
+type HTTPClient struct {
 	scheme     Scheme
 	host       string
 	port       uint16
@@ -54,12 +57,11 @@ type httpClient struct {
 	oauthToken string
 }
 
-// NewHTTPClient returns a Client implementation that can talk to the IronMQ v3
-// API documented at http://dev.iron.io/mq/3/reference/api/
-func NewHTTPClient(scheme Scheme, host string, port uint16) Client {
+// NewHTTPClient returns a new HTTPClient that talks to the IronMQ v3 API at {scheme}://{host}:{port}
+func NewHTTPClient(scheme Scheme, host string, port uint16) *HTTPClient {
 	transport := &http.Transport{}
 	client := &http.Client{Transport: transport}
-	return &httpClient{
+	return &HTTPClient{
 		scheme:    scheme,
 		host:      host,
 		port:      port,
@@ -69,7 +71,7 @@ func NewHTTPClient(scheme Scheme, host string, port uint16) Client {
 }
 
 // headers sets json and oauth headers on r
-func (h *httpClient) newReq(method, token, projID, path string, body io.Reader) (*http.Request, error) {
+func (h *HTTPClient) newReq(method, token, projID, path string, body io.Reader) (*http.Request, error) {
 	urlStr := fmt.Sprintf("%s://%s:%d/3/projects/%s/%s", h.scheme, h.host, h.port, projID, path)
 	req, err := http.NewRequest(method, urlStr, body)
 	if err != nil {
@@ -84,8 +86,8 @@ type enqueueReq struct {
 	Messages []NewMessage `json:"messages"`
 }
 
-// Enqueue posts messages to IronMQ using the API defined at http://dev.iron.io/mq/3/reference/api/#post-messages
-func (h *httpClient) Enqueue(ctx context.Context, token, projID, qName string, msgs []NewMessage) (*Enqueued, error) {
+// Enqueue is the Client implementation for the v3 API http://dev.iron.io/mq/3/reference/api/#post-messages
+func (h *HTTPClient) Enqueue(ctx context.Context, token, projID, qName string, msgs []NewMessage) (*Enqueued, error) {
 	reqBody := &bytes.Buffer{}
 	if err := json.NewEncoder(reqBody).Encode(enqueueReq{Messages: msgs}); err != nil {
 		return nil, err
@@ -123,8 +125,8 @@ type dequeueResp struct {
 	Messages []DequeuedMessage `json:"messages"`
 }
 
-// Dequeue gets messages from IronMQ using the API defined at http://dev.iron.io/mq/3/reference/api/#reserve-messages
-func (h *httpClient) Dequeue(ctx context.Context, token, projID, qName string, num int, timeout Timeout, wait Wait, delete bool) ([]DequeuedMessage, error) {
+// Dequeue is the client implementation for the v3 API (http://dev.iron.io/mq/3/reference/api/#reserve-messages)
+func (h *HTTPClient) Dequeue(ctx context.Context, token, projID, qName string, num int, timeout Timeout, wait Wait, delete bool) ([]DequeuedMessage, error) {
 	if !timeoutInRange(timeout) {
 		return nil, ErrTimeoutOutOfRange
 	}
@@ -161,7 +163,8 @@ type deleteReservedReq struct {
 	ReservationID string `json:"reservation_id"`
 }
 
-func (h *httpClient) DeleteReserved(ctx context.Context, token, projID, qName string, messageID int, reservationID string) (*Deleted, error) {
+// DeleteReserved is the client implementation for the IronMQ v3 API (http://dev.iron.io/mq/3/reference/api/#delete-message)
+func (h *HTTPClient) DeleteReserved(ctx context.Context, token, projID, qName string, messageID int, reservationID string) (*Deleted, error) {
 	body := &bytes.Buffer{}
 	if err := json.NewEncoder(body).Encode(deleteReservedReq{ReservationID: reservationID}); err != nil {
 		return nil, err

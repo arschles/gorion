@@ -15,7 +15,9 @@ type memMsg struct {
 	DequeuedMessage
 }
 
-type memClient struct {
+// MemClient is a Client implementation for pure in-memory queues. It's intended
+// primarily for unit tests and not recommended for production use
+type MemClient struct {
 	lck sync.Locker
 	tmr timer.Timer
 	// the counter for message IDs
@@ -29,9 +31,9 @@ type memClient struct {
 // NewMemClient returns a purely in-memory Client implementation that can be used
 // for testing. Note that funcs with in-memory client receivers do not pay attention
 // to the context.Context parameters that are passed to them.
-func NewMemClient() Client {
+func NewMemClient() *MemClient {
 	mtx := sync.Mutex{}
-	return &memClient{
+	return &MemClient{
 		lck:      &mtx,
 		tmr:      timer.NewTimer(),
 		ctr:      0,
@@ -40,7 +42,7 @@ func NewMemClient() Client {
 	}
 }
 
-func (m *memClient) newMemMsg(n NewMessage) memMsg {
+func (m *MemClient) newMemMsg(n NewMessage) memMsg {
 	id := atomic.AddUint64(&m.ctr, 1)
 	return memMsg{
 		NewMessage: n,
@@ -57,7 +59,8 @@ func qKey(projID, qName string) string {
 	return projID + "|" + qName
 }
 
-func (m *memClient) Enqueue(ctx context.Context, token, projID, qName string, msgs []NewMessage) (*Enqueued, error) {
+// Enqueue is the interface implementation
+func (m *MemClient) Enqueue(ctx context.Context, token, projID, qName string, msgs []NewMessage) (*Enqueued, error) {
 	ret := &Enqueued{}
 	m.lck.Lock()
 	defer m.lck.Unlock()
@@ -76,7 +79,8 @@ func (m *memClient) Enqueue(ctx context.Context, token, projID, qName string, ms
 	return ret, nil
 }
 
-func (m *memClient) Dequeue(ctx context.Context, token, projID, qName string, num int, timeout Timeout, wait Wait, delete bool) ([]DequeuedMessage, error) {
+// Dequeue is the interface implementation
+func (m *MemClient) Dequeue(ctx context.Context, token, projID, qName string, num int, timeout Timeout, wait Wait, delete bool) ([]DequeuedMessage, error) {
 	ch := make(chan memMsg)
 
 	go func() {
@@ -115,7 +119,8 @@ func (m *memClient) Dequeue(ctx context.Context, token, projID, qName string, nu
 	return ret, nil
 }
 
-func (m *memClient) DeleteReserved(ctx context.Context, token, projID, qName string, messageID int, reservationID string) (*Deleted, error) {
+// DeleteReserved is the interface implementation
+func (m *MemClient) DeleteReserved(ctx context.Context, token, projID, qName string, messageID int, reservationID string) (*Deleted, error) {
 	m.lck.Lock()
 	defer m.lck.Unlock()
 	msg, ok := m.reserved[reservationID]
@@ -128,7 +133,7 @@ func (m *memClient) DeleteReserved(ctx context.Context, token, projID, qName str
 	return &Deleted{Msg: "deleted"}, nil
 }
 
-func (m *memClient) releaseReservedMsg(projID, qName, resID string, timeout Timeout) {
+func (m *MemClient) releaseReservedMsg(projID, qName, resID string, timeout Timeout) {
 	m.tmr.Sleep(time.Duration(int(timeout)) * time.Second)
 	m.lck.Lock()
 	defer m.lck.Unlock()
@@ -140,7 +145,7 @@ func (m *memClient) releaseReservedMsg(projID, qName, resID string, timeout Time
 	m.queues[qKey(projID, qName)] = append(m.queues[qKey(projID, qName)], msg)
 }
 
-func (m *memClient) deferEnqueue(projID, qName string, msg memMsg) {
+func (m *MemClient) deferEnqueue(projID, qName string, msg memMsg) {
 	m.tmr.Sleep(time.Duration(int(msg.Delay)) * time.Second)
 	m.lck.Lock()
 	defer m.lck.Unlock()
