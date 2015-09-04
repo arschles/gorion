@@ -95,6 +95,7 @@ func (m *memClient) Dequeue(ctx context.Context, token, projID, qName string, nu
 				} else {
 					msg := q[0]
 					q = q[1:]
+					m.queues[qKey(projID, qName)] = q
 					msg.ReservedCount++
 					msg.ReservationID = uuid.New()
 					if !delete {
@@ -105,7 +106,6 @@ func (m *memClient) Dequeue(ctx context.Context, token, projID, qName string, nu
 				}
 			}
 		}
-		m.queues[qKey(projID, qName)] = q
 	}()
 
 	var ret []DequeuedMessage
